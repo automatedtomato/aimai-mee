@@ -21,20 +21,20 @@ public class LoginAttemptTracker {
 	}
 	
 	public boolean isAccountBlocked() {
-		if (lockExpirationTime == null) {
+		if (lockExpirationTime == null || !isBlocked) {
 			return false;
-		} if(LocalDateTime.now().isAfter(lockExpirationTime)) {
+		} 
+		
+		if(LocalDateTime.now().isAfter(lockExpirationTime)) {
 			setAccountUnblocked();
 			return false;
 		}
-		return isBlocked;
+		return true;
 	}
 	
 	public void setAccountBlocked() {
-		if (LocalDateTime.now().isBefore(lockExpirationTime)) {
-			isBlocked = true;
-			}
-		lockExpirationTime = LocalDateTime.now().plusMinutes(LOCK_TIME);
+		isBlocked = true;
+		lockExpirationTime = LocalDateTime.now().plusMinutes(LOCK_TIME); 
 	}
 	
 	public int getAttempts() {

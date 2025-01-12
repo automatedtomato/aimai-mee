@@ -39,10 +39,16 @@ body {
 }
 
 /* Updated Nav styles */
-.nav-left, .nav-right {
+.nav-left {
   display: flex;
   align-items: center;
   gap: 2rem;
+}
+
+.nav-right {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
 }
 
 .nav-links {
@@ -143,6 +149,7 @@ body {
 }
 
 .nav-button {
+  font-size: 0.875rem;
   background-color: var(--accent-primary);
   color: var(--bg-primary);
   padding: 0.5rem 1rem;
@@ -222,6 +229,15 @@ body {
 }
 
 .auth-link a {
-  color: var(--accent-primary);
+  color: var(--accent-secondary);
   text-decoration: none;
+}
+
+.auth-link a:hover {
+    text-decoration: underline;
+}
+
+.username {
+    color: var(--text-primary);
+    margin-right: 1rem;
 }

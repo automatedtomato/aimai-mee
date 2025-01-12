@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.automatedtomato.aimaimee.model.User;
 import com.automatedtomato.aimaimee.util.LoginAttemptTracker;
 
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 public class AuthController {
 	List<User> userList = new ArrayList<>();
@@ -34,7 +36,8 @@ public class AuthController {
 	public String processLogin(
         @RequestParam String username,
         @RequestParam String password,
-        Model model) {
+        Model model,
+		HttpSession session) {
     
 		// Input validation
 	    if (username.isEmpty() || password.isEmpty()) {
@@ -60,8 +63,20 @@ public class AuthController {
 	    }
 	    
 	    if (loginSuccessful) {
-        tracker.resetAttempts();
-        return "redirect:/";  // Redirect on success
+	    	
+	    	// Store user info in session
+	    	session.setAttribute("username", username);
+	    	session.setAttribute("isLoggedIn", true);
+	    	
+	    	for (User user : userList) {
+	    		if (user.getUsername().equals(username)) {
+	    			session.setAttribute("isAdmin", user.isAdmin());
+	    			break;
+	    		}
+	    	}
+	    	
+	    	tracker.resetAttempts();    // Reset attempts
+	    	return "redirect:/";  // Redirect on success
         
 	    } else {
 	        tracker.recordFailedAttempt();  // Record failed attempt
@@ -117,5 +132,23 @@ public class AuthController {
 		return "redirect:/login";	// Redirect to login page
 	}
 	
+	@GetMapping("/logout")
+	public String logoutGet(HttpSession session) {
+		return logout(session);
+	}
+	
+	@PostMapping("/logout")
+	public String logout(HttpSession session) {
+		session.invalidate();
+		return "redirect:/login";
+	}
+
+	public List<User> getUserList() {
+		return userList;
+	}
+	
+	public void clearLoginTrackers() {
+	    loginTrackers.clear();
+	}
 	
 }
