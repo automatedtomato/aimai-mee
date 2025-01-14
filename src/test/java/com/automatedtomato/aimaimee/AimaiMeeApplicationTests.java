@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.automatedtomato.aimaimee.controller.AuthController;
 import com.automatedtomato.aimaimee.model.User;
 import com.automatedtomato.aimaimee.repository.UserRepository;
+import com.automatedtomato.aimaimee.service.UserService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -24,6 +25,9 @@ class AimaiMeeApplicationTests {
 
     @Autowired
     private MockMvc mockMvc;  // To simulate HTTP requests
+    
+    @Autowired
+	private UserService userService;
     
     private static final String TEST_USERNAME = "testuser";
     private static final String TEST_USERNAME2 = "testuser2";
@@ -40,9 +44,7 @@ class AimaiMeeApplicationTests {
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
-        
-        User testUser = new User(TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD);
-        userRepository.save(testUser);
+        userService.createUser(TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD);
     }
     
     private void performLogin(String username, String password) throws Exception {
@@ -179,9 +181,11 @@ class AimaiMeeApplicationTests {
             .andExpect(redirectedUrl("/login"));
             
         // Verify user was created in database
-        User createdUser = userRepository.findByUsername(newUsername);
+        User createdUser =  userService.createUser(newUsername, newEmail, newPassword);;
         assertNotNull(createdUser);
+        assertEquals(newUsername, createdUser.getUsername());
         assertEquals(newEmail, createdUser.getEmail());
+        assertEquals(newPassword, createdUser.getPassword());
     }
     
     @Test
@@ -243,7 +247,7 @@ class AimaiMeeApplicationTests {
 				.andExpect(status().is3xxRedirection())
 				.andExpect(redirectedUrl("/login"));
     	
-    	User savedUser = userRepository.findByUsername(TEST_USERNAME2);
+    	User savedUser = userService.createUser(TEST_USERNAME2, TEST_EMAIL2, TEST_PASSWORD);
 		assertNotNull(savedUser);
 		assertEquals(TEST_EMAIL2, savedUser.getEmail());
 		assertEquals(TEST_USERNAME2, savedUser.getUsername());

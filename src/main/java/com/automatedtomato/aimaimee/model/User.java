@@ -27,7 +27,7 @@ public class User {
 	
 	@Column(name="is_admin")
 	private boolean isAdmin;
-	
+
 	public User() {
 		this.createdAt = LocalDateTime.now();
 		this.isAdmin = false;
@@ -71,7 +71,7 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
+	
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}

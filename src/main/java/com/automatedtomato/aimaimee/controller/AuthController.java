@@ -1,8 +1,6 @@
 package com.automatedtomato.aimaimee.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.automatedtomato.aimaimee.model.User;
 import com.automatedtomato.aimaimee.repository.UserRepository;
+import com.automatedtomato.aimaimee.service.UserService;
 import com.automatedtomato.aimaimee.util.LoginAttemptTracker;
 
 import jakarta.servlet.http.HttpSession;
@@ -21,7 +20,7 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class AuthController {
 	@Autowired
-	private UserRepository userRepository;
+	private UserService userService;
 	Map<String, LoginAttemptTracker> loginTrackers = new HashMap<>();
 
 	
@@ -57,10 +56,10 @@ public class AuthController {
 	    }
 	    
 	    // Check credentials
-	    boolean loginSuccessful = false;
-	    User user = userRepository.findByUsername(username);
-	        if (user != null && user.getPassword().equals(password)) {
-	            loginSuccessful = true;  // Set to TRUE on success
+	    boolean loginSuccessful = userService.authenticateUser(username, password);
+	    User user = null;
+	        if (loginSuccessful) {
+	        	user = userService.findByUsername(username);
 	        }
 	    
 	        if (loginSuccessful) {
@@ -108,19 +107,18 @@ public class AuthController {
 		}
 		
 		// Check if username or email already exists
-			if (userRepository.existsByUsername(username)) {
+			if (userService.existsByUsername(username)) {
 				model.addAttribute("error", "Username already exists");
 				return "signup";
 			}
-			if (userRepository.existsByEmail(email)) {
+			if (userService.existsByEmail(email)) {
 				model.addAttribute("error", "Email already exists");
 				return "signup";
 			}
 		
 		
 		// Create new user
-		User newUser = new User (username, email, password);
-		userRepository.save(newUser);
+		userService.createUser(username, email, password);
 		
 		model.addAttribute("success", "Registration successful! Please login");
 		return "redirect:/login";	// Redirect to login page
