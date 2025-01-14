@@ -2,14 +2,30 @@ package com.automatedtomato.aimaimee.model;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.*;
+
 //TODO setPassword method creation is pending
 
+@Entity
+@Table(name="users")
 public class User {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)  // Auto-generated ID values
 	private long id;
+	
+	@Column(name="username")
 	private String username;
+	
+	@Column(name="email")
 	private String email;
+	
+	@Column(name="password")
 	private String password;
+	
+	@Column(name="created_at")
 	private LocalDateTime createdAt;
+	
+	@Column(name="is_admin")
 	private boolean isAdmin;
 	
 	public User() {
