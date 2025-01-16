@@ -1,5 +1,7 @@
 package com.automatedtomato.aimaimee.controller;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,9 +12,10 @@ import jakarta.servlet.http.HttpSession;
 public class HomeController {
 	
 	@GetMapping("/")
-	public String homePage(HttpSession session, Model model) {
+	public String homePage(Model model) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		
-		if (Boolean.TRUE.equals(session.getAttribute("isLoggedIn"))) {
+		if (authentication != null && authentication.isAuthenticated()){
 			return "index";
 		} else {
 			model.addAttribute("error", "You are not logged in");

@@ -181,12 +181,12 @@ class AimaiMeeApplicationTests {
             .andExpect(redirectedUrl("/login"));
             
         // Verify user was created in database
-        User createdUser =  userService.createUser(newUsername, newEmail, newPassword);;
+        User createdUser =  userService.findByUsername(newUsername);
         assertNotNull(createdUser);
         assertEquals(newUsername, createdUser.getUsername());
         assertEquals(newEmail, createdUser.getEmail());
-        assertEquals(newPassword, createdUser.getPassword());
-    }
+        assertTrue(userService.authenticateUser(newUsername, newPassword));
+        }
     
     @Test
     void signupShouldPreventDuplicateUsername() throws Exception {
@@ -247,12 +247,11 @@ class AimaiMeeApplicationTests {
 				.andExpect(status().is3xxRedirection())
 				.andExpect(redirectedUrl("/login"));
     	
-    	User savedUser = userService.createUser(TEST_USERNAME2, TEST_EMAIL2, TEST_PASSWORD);
+    	User savedUser = userService.findByUsername(TEST_USERNAME2);
 		assertNotNull(savedUser);
 		assertEquals(TEST_EMAIL2, savedUser.getEmail());
 		assertEquals(TEST_USERNAME2, savedUser.getUsername());
-		assertEquals(TEST_PASSWORD, savedUser.getPassword());
-		
+		assertTrue(userService.authenticateUser(TEST_USERNAME2, TEST_PASSWORD));		
     }
     
 }

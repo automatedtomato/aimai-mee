@@ -1,6 +1,9 @@
 package com.automatedtomato.aimaimee.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -8,13 +11,34 @@ import com.automatedtomato.aimaimee.model.User;
 import com.automatedtomato.aimaimee.repository.UserRepository;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 	
-	@Autowired
-	private BCryptPasswordEncoder passwordEncoder;
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	    User user = findByUsername(username);
+	    if (user == null) {
+	        System.out.println("DEBUG: User not found: " + username);
+	        throw new UsernameNotFoundException("User not found");
+	    }
+	    System.out.println("DEBUG: Found user: " + username);
+	    System.out.println("DEBUG: User password hash: " + user.getPassword());
+	    
+	    return org.springframework.security.core.userdetails.User
+	            .withUsername(user.getUsername())
+	            .password(user.getPassword())
+	            .roles("USER")
+	            .build();
+	}
+	
+	private final BCryptPasswordEncoder passwordEncoder;
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	public UserService(BCryptPasswordEncoder passwordEncoder) {
+		this.passwordEncoder = passwordEncoder;
+	}
 	
 	public User createUser(String userName, String email, String rawPassword) {
 		User user = new User(userName, email, passwordEncoder.encode(rawPassword));
