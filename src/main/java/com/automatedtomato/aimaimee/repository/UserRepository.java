@@ -10,12 +10,14 @@ import com.automatedtomato.aimaimee.model.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 	
 	User findByUsername(String username);
+	List<User> findByUsernameContaining(String usernamePart);
 	boolean existsByUsername(String username);
+	
+	User findByEmail(String email);
+	List<User> findByEmailContaining(String domain);
 	boolean existsByEmail(String email);
 	
 	List<User> findByCreatedAtAfter(LocalDateTime createdAt);
+	
 	int countByIsAdmin(boolean isAdmin);
-	List<User> findByEmailContaining(String domain);
-	List<User> findByUsernameContaining(String usernamePart);
-	User findByEmail(String email);
 }
